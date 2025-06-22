@@ -1,67 +1,89 @@
-# NailColorizer Lite (EC2 + FastAPI + API Gateway)
+# NailColorizer Lite for Salons 💅
 
-This project sets up a full AWS deployment of a nail recoloring app using:
-- EC2 with FastAPI + Python (rembg + OpenCV)
-- S3 buckets for input/output images
-- API Gateway (HTTP) as a proxy to EC2
-- Terraform-managed infrastructure
+This project deploys a fully functional AI-powered nail color preview app tailored for salons and beauty shops.
+It includes:
 
----
-
-## 📦 Components
-
-| Component | Purpose |
-|----------|---------|
-| EC2 t3.micro | Hosts the FastAPI app on port 8000 |
-| API Gateway HTTP API | Proxies /recolor to EC2 server |
-| S3 Bucket 1 | Stores hand images (`nailcolorizer-hand-inputs`) |
-| S3 Bucket 2 | Stores preset overlay images (`nailcolorizer-preset-overlays`) |
-| IAM Roles | Allow EC2 to read/write to S3 |
+- 📦 EC2 server running FastAPI (Python) to apply polish via AI
+- 🌐 API Gateway (HTTP) to expose a /recolor endpoint
+- 🪣 S3 static website hosting with a CloudFront HTTPS layer
+- 📲 Static site where users can take/upload a photo and apply a polish color
 
 ---
 
-## 🚀 Deployment
+## 🧰 Requirements
+- Terraform (v1.0+)
+- AWS CLI (configured with credentials)
+- Valid EC2 Key Pair (for SSH)
 
-1. Extract this ZIP.
-2. Open terminal in the `terraform/` folder.
-3. Initialize Terraform:
-```bash
-terraform init
+---
+
+## 🚀 Deployment Instructions
+
+### ⏱️ Deployment Time Expectations
+**Total deployment time: 5-10 minutes**
+- EC2, S3, API Gateway: ~2-3 minutes
+- **CloudFront Distribution: ~5-7 minutes** (AWS requirement)
+- The script will show progress and wait appropriately
+
+### 1. Customize Variables
+Edit your `terraform.tfvars` or provide the key name during apply:
+```hcl
+key_pair_name = "your-ec2-key"
 ```
 
-4. Apply infrastructure (replace with your EC2 key pair name):
+### 2. Prepare UI Files
+Ensure the following files exist in your Terraform root directory:
+- `index.html` — the main UI (mobile-optimized)
+- `main.js` — JavaScript logic for image upload and API call
+
+### 3. Deploy Infrastructure
+Run the wrapper script:
 ```bash
-terraform apply -var="key_pair_name=your-key-name"
+chmod +x deploy_full_stack.sh
+./deploy_full_stack.sh
 ```
 
-5. Upload hand images to `nailcolorizer-hand-inputs` via AWS Console or CLI.
+This will:
+- Initialize and apply Terraform
+- Generate `api-info.json`
+- Upload static site to S3
+- Invalidate CloudFront cache for instant update
+- **Wait for CloudFront deployment** (this takes 5-7 minutes)
 
 ---
 
-## 🧪 API Test with cURL
+## 🔎 Output
+After deployment, Terraform will output:
 
-Once deployed, test the API with:
+- `api_url`: API endpoint for recoloring nails
+- `website_url`: Public HTTPS site for salons to use
 
-```bash
-curl -X POST https://<api-id>.execute-api.<region>.amazonaws.com/recolor \
-  -F "file=@hand.jpg" \
-  -F "color=#FF69B4"
+Example:
+```txt
+API Endpoint: https://xyz123.execute-api.us-east-1.amazonaws.com/recolor
+Website: https://d1abcdefgh.cloudfront.net
 ```
 
-> Replace `<api-id>` and `<region>` with values from the API Gateway endpoint.
+---
+
+## 🎨 Try It Out
+Visit the website URL and:
+- Choose a polish color
+- Take/upload a photo of a hand
+- See the polished version in seconds!
 
 ---
 
-## 🛠️ Useful Tips
+## 🧼 Cleanup
+To destroy all resources:
+```bash
+terraform destroy
+```
 
-- Logs: View EC2 logs using `tmux attach -t nailcolorizer` after SSH.
-- Security Groups: Port 8000 is open for API Gateway; restrict in production.
-- HTTPS: Add NGINX + SSL for production environments.
+## ⚠️ Important Notes
+- **CloudFront takes 5-7 minutes to deploy** - this is normal AWS behavior
+- The deployment script includes proper error handling and logging
+- All deployment logs are saved to `deploy.log`
+- The website will be available via HTTPS through CloudFront
 
----
-
-## ✨ Notes
-
-- This solution uses rembg's ONNX backend (no torch needed).
-- Make sure images are in `.png` or `.jpg` format.
-
+Enjoy NailColorizer Lite ✨

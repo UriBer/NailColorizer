@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NailColorizer Lite for Salons</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f6f6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 640px;
+      margin: 2rem auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      color: #c2185b;
+    }
+    p {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .color-button {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      margin: 0.25rem;
+      border: 2px solid #eee;
+      cursor: pointer;
+      display: inline-block;
+    }
+    label, input, button {
+      display: block;
+      margin: 1rem auto;
+      width: 100%;
+      max-width: 400px;
+    }
+    input[type="file"], input[type="color"] {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #c2185b;
+      color: white;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #a3154c;
+    }
+    #preview {
+      display: block;
+      margin: 1rem auto;
+      max-width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+    .color-picker-row {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>NailColorizer Lite</h1>
+    <p>Let customers try out nail colors instantly using AI</p>
+
+    <label for="color">Choose a Polish Color:</label>
+    <div class="color-picker-row">
+      <span class="color-button" style="background:#FF69B4" onclick="selectColor('#FF69B4')"></span>
+      <span class="color-button" style="background:#E75480" onclick="selectColor('#E75480')"></span>
+      <span class="color-button" style="background:#DC143C" onclick="selectColor('#DC143C')"></span>
+      <span class="color-button" style="background:#8B008B" onclick="selectColor('#8B008B')"></span>
+      <input type="color" id="customColor" onchange="selectColor(this.value)">
+    </div>
+    <input type="hidden" id="selectedColor" value="#FF69B4">
+
+    <label for="fileInput">Take or Upload a Hand Photo:</label>
+    <input type="file" id="fileInput" accept="image/*" capture="environment">
+
+    <button onclick="submitForm()">Apply Polish</button>
+
+    <img id="preview" src="" alt="Preview will appear here" hidden>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

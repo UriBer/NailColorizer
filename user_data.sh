@@ -1,20 +1,27 @@
 #!/bin/bash
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+
+echo "--- Starting User Data Script ---"
 
 # Update and install dependencies
-apt-get update -y
-apt-get upgrade -y
-apt-get install -y python3 python3-pip tmux unzip curl
+echo "Updating and installing system dependencies..."
+sudo apt-get update -y
+sudo apt-get upgrade -y
+sudo apt-get install -y python3 python3-pip tmux unzip curl
 
 # Install required Python libraries
-pip3 install --upgrade pip
-pip3 install fastapi uvicorn[standard] pillow numpy boto3 rembg[onnx] opencv-python-headless
+echo "Installing Python libraries..."
+sudo pip3 install --upgrade pip
+sudo pip3 install fastapi uvicorn[standard] pillow numpy boto3 rembg[onnx] opencv-python-headless
 
 # Create app directory
-mkdir -p /opt/nailcolorizer
+echo "Creating application directory..."
+sudo mkdir -p /opt/nailcolorizer
 cd /opt/nailcolorizer
 
 # Create main FastAPI app
-cat << 'EOF' > main.py
+echo "Creating main.py..."
+sudo cat << 'EOF' > main.py
 from fastapi import FastAPI, UploadFile, Form
 from fastapi.responses import StreamingResponse
 from rembg import remove
@@ -47,4 +54,7 @@ async def recolor(file: UploadFile, color: str = Form(...)):
 EOF
 
 # Start server in tmux
-tmux new-session -d -s nailcolorizer 'uvicorn main:app --host 0.0.0.0 --port 8000'
+echo "Starting Uvicorn server in a tmux session..."
+sudo tmux new-session -d -s nailcolorizer 'uvicorn main:app --host 0.0.0.0 --port 8000'
+
+echo "--- User Data Script Finished ---"
